@@ -1,0 +1,7 @@
+D:\_Code_programmes\Projects Visual Studio 2017\Pacman\Pacman\bin\Debug\Pacman.exe.config
+D:\_Code_programmes\Projects Visual Studio 2017\Pacman\Pacman\bin\Debug\Pacman.exe
+D:\_Code_programmes\Projects Visual Studio 2017\Pacman\Pacman\bin\Debug\Pacman.pdb
+D:\_Code_programmes\Projects Visual Studio 2017\Pacman\Pacman\obj\Debug\Pacman.csprojAssemblyReference.cache
+D:\_Code_programmes\Projects Visual Studio 2017\Pacman\Pacman\obj\Debug\Pacman.csproj.CoreCompileInputs.cache
+D:\_Code_programmes\Projects Visual Studio 2017\Pacman\Pacman\obj\Debug\Pacman.exe
+D:\_Code_programmes\Projects Visual Studio 2017\Pacman\Pacman\obj\Debug\Pacman.pdb

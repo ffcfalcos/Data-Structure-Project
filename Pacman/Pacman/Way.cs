@@ -10,7 +10,7 @@ namespace Pacman
     {
         public int x;
         public int y;
-        public int score;
+        public double score;
         public List<string> list;
         public enum direction { left, right, down, up }
 

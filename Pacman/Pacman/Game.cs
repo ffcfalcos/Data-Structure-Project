@@ -9,8 +9,9 @@ namespace Pacman
     public sealed class Game
     {
         string[,] matrix;
+        int score_max = 42;
         Pacman p;
-        Monster m1 = new Monster("red", 6, 6);
+        Monster m1 = new Monster("red", 0, 3);
 
         public Game()
         {
@@ -20,7 +21,7 @@ namespace Pacman
 
         public void matrix_creation()
         {
-            string[,] mat = { { "P ", "* ", "* ", "* ", "* ", "* ", "* ", "* " }, { "* ", "- ", "* ", "- ", "- ", "- ", "- ", "* " }, { "* ", "- ", "* ", "- ", "* ", "* ", "* ", "* " }, { "* ", "- ", "* ", "- ", "* ", "- ", "* ", "- " }, { "* ", "* ", "* ", "* ", "* ", "- ", "* ", "* " }, { "* ", "- ", "- ", "- ", "* ", "- ", "- ", "* " }, { "* ", "- ", "* ", "* ", "* ", "- ", "M ", "* " }, { "* ", "* ", "* ", "- ", "* ", "* ", "* ", "- " } };
+            string[,] mat = { { "P ", "* ", "* ", "* ", "* ", "* ", "* ", "* " }, { "* ", "- ", "* ", "- ", "- ", "- ", "- ", "* " }, { "* ", "- ", "* ", "- ", "* ", "* ", "* ", "* " }, { "* ", "- ", "* ", "- ", "* ", "- ", "* ", "- " }, { "* ", "* ", "* ", "* ", "* ", "- ", "* ", "* " }, { "* ", "- ", "- ", "- ", "* ", "- ", "- ", "* " }, { "* ", "- ", "* ", "* ", "* ", "- ", "* ", "* " }, { "* ", "* ", "* ", "- ", "* ", "* ", "* ", "- " } };
             matrix = mat;
         }
 
@@ -41,24 +42,28 @@ namespace Pacman
         {
             if (direction == "down")
             {
+                if(matrix[p.y + 1, p.x] == "* ") { p.score++; }
                 matrix[p.y + 1, p.x] = "P ";
                 matrix[p.y, p.x] = ". ";
                 p.y++;
             }
             if (direction == "up")
             {
+                if (matrix[p.y - 1, p.x] == "* ") { p.score++; }
                 matrix[p.y - 1, p.x] = "P ";
                 matrix[p.y, p.x] = ". ";
                 p.y--;
             }
             if (direction == "left")
             {
+                if (matrix[p.y, p.x - 1] == "* ") { p.score++; }
                 matrix[p.y, p.x - 1] = "P ";
                 matrix[p.y, p.x] = ". ";
                 p.x--;
             }
             if (direction == "right")
             {
+                if (matrix[p.y, p.x + 1] == "* ") { p.score++; }
                 matrix[p.y, p.x + 1] = "P ";
                 matrix[p.y, p.x] = ". ";
                 p.x++;
@@ -103,7 +108,8 @@ namespace Pacman
 
         public bool end()
         {
-            if (p.x == m1.x && p.y == m1.y) { return true; }
+            if (p.x == m1.x && p.y == m1.y) { Console.WriteLine("Game Over"); return true; }
+            else if (p.score >= score_max) { Console.WriteLine("Win !"); return true; }
             else { return false; }
         }
 
@@ -160,7 +166,7 @@ namespace Pacman
 
         public bool can_move(Way way, string direction)
         {
-            if (direction == "top")
+            if (direction == "up")
             {
                 if (way.y == 0 || matrix[way.y - 1, way.x] == "- ") { return false; }
                 else { return true; }
@@ -188,37 +194,43 @@ namespace Pacman
         {
             List<string> fuite = new List<string>();
             List<Way> way_list = new List<Way>();
-            if(can_move(p,"up") && p.previous != "down")
+            if(can_move(p,"up"))
             {
                 Way way = new Way(p.x, p.y - 1);
                 if (matrix[way.y, way.x] == "* ") { way.score++; }
+                if (p.previous == "down") { way.score -= 8; }
                 way.list.Add("up");
                 way_list.Add(way);
             }
-            if (can_move(p, "down") && p.previous != "up")
+            if (can_move(p, "down"))
             {
                 Way way = new Way(p.x, p.y + 1);
                 if (matrix[way.y, way.x] == "* ") { way.score++; }
+                if (p.previous == "up") { way.score -= 8; }
                 way.list.Add("down");
                 way_list.Add(way);
             }
-            if (can_move(p, "left") && p.previous != "right")
+            if (can_move(p, "left"))
             {
                 Way way = new Way(p.x - 1, p.y);
                 if (matrix[way.y, way.x] == "* ") { way.score++; }
+                if (p.previous == "right") { way.score -= 8; }
                 way.list.Add("left");
                 way_list.Add(way);
             }
-            if (can_move(p, "right") && p.previous != "left")
+            if (can_move(p, "right"))
             {
                 Way way = new Way(p.x + 1, p.y);
                 if (matrix[way.y, way.x] == "* ") { way.score++; }
+                if (p.previous == "left") { way.score -= 8; }
                 way.list.Add("right");
                 way_list.Add(way);
             }
+            int div = 1;
             int i = 0;
             while (i <= power)
             {
+                if (i > 6) { div = 2; }
                 int u = way_list.Count;
                 for (int k = 0; k < u ; k++)
                 {
@@ -227,7 +239,7 @@ namespace Pacman
                       {
                         Way way = new Way(wayt);
                         way.y -= 1;
-                        if (matrix[way.y,way.x] == "* ") { way.score++; }
+                        if (matrix[way.y,way.x] == "* ") { way.score += (1 / div); }
                         if (matrix[way.y, way.x] == "M " && wayt.list.Count < 4)
                         {
                             fuite.Add(wayt.list[0]);
@@ -239,7 +251,7 @@ namespace Pacman
                     {
                         Way way = new Way(wayt);
                         way.y += 1;
-                        if (matrix[way.y, way.x] == "* ") { way.score++; }
+                        if (matrix[way.y, way.x] == "* ") { way.score += (1 / div); }
                         if (matrix[way.y, way.x] == "M " && wayt.list.Count < 4) { fuite.Add(wayt.list[0]); }
                         way.list.Add("down");
                         way_list.Add(way);
@@ -248,7 +260,7 @@ namespace Pacman
                     {
                         Way way = new Way(wayt);
                         way.x -= 1;
-                        if (matrix[way.y, way.x] == "* ") { way.score++; }
+                        if (matrix[way.y, way.x] == "* ") { way.score += (1 / div); }
                         if (matrix[way.y, way.x] == "M " && wayt.list.Count < 4) { fuite.Add(wayt.list[0]); }
                         way.list.Add("left");
                         way_list.Add(way);
@@ -257,7 +269,7 @@ namespace Pacman
                     {
                         Way way = new Way(wayt);
                         way.x += 1;
-                        if (matrix[way.y, way.x] == "* ") { way.score++; }
+                        if (matrix[way.y, way.x] == "* ") { way.score += (1 / div); }
                         if (matrix[way.y, way.x] == "M " && wayt.list.Count < 4)
                         { fuite.Add(wayt.list[0]); }
                         way.list.Add("right");
@@ -267,12 +279,18 @@ namespace Pacman
                 way_list.RemoveRange(0, u);
                 i++;
             }
-            fuite = table_unique(fuite);
-            foreach (string temp in fuite)
+            //fuite = table_unique(fuite);
+            if (fuite.Count > 0)
             {
-                for (int v = 0; v < fuite.Count; v++)
+                foreach (string element in fuite)
                 {
-                    if (way_list[v].list[0] == temp) { way_list.RemoveAt(v); }
+                    for (int k = way_list.Count-1; k >= 0; k--)
+                    {
+                        if (way_list[k].list[0] == element)
+                        {
+                            way_list.RemoveAt(k);
+                        }
+                    }
                 }
             }
             Way Wayt = way_list[0];
@@ -293,12 +311,14 @@ namespace Pacman
             {
                 red_move();
                 matrix_display();
+                if (p.x == m1.x && p.y == m1.y) { Console.WriteLine("Game Over"); break; }
                 Console.ReadKey();
-                string way = best_way(8);
+                string way = best_way(16);
                 move(way);
                 p.previous = way;
                 Console.WriteLine();
             }
+            matrix_display();
             Console.WriteLine("End Game");
             Console.ReadKey();
         }

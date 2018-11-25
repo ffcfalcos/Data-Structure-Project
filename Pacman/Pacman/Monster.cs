@@ -10,11 +10,12 @@ namespace Pacman
     {
         public string color;
         public string cover;
+        public string previous;
 
         public Monster(string color, int x, int y) : base (x,y)
         {
             this.color = color;
-            this.cover = "* ";
+            cover = "* ";
         }
     }
 }

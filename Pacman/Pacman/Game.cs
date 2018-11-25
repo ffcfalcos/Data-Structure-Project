@@ -8,22 +8,63 @@ namespace Pacman
 {
     public sealed class Game
     {
-        string[,] matrix;
-        int score_max = 44;
+        string[,] matrix; //A Creer par ligne
+        int size;
+        int score_max;
+        int safety = 4;
+        int fixe_safety = 4;
         Pacman p;
-        Monster m1 = new Monster("red", 0, 3);
-        Monster m2 = new Monster("blue", 4, 2);
+        Monster m1;
+        Monster m2;
+        Monster m3;
 
         public Game()
         {
             p = new Pacman(0,0);
-            matrix_creation();
         }
 
-        public void matrix_creation()
+        public void init()
         {
-            string[,] mat = { { "P ", "* ", "* ", "* ", "* ", "* ", "* ", "* " }, { "* ", "- ", "* ", "- ", "* ", "- ", "- ", "* " }, { "* ", "- ", "* ", "* ", "M ", "* ", "* ", "* " }, { "* ", "- ", "* ", "- ", "* ", "- ", "* ", "- " }, { "* ", "* ", "* ", "* ", "* ", "- ", "* ", "* " }, { "* ", "- ", "- ", "- ", "* ", "- ", "- ", "* " }, { "* ", "- ", "* ", "* ", "* ", "- ", "* ", "* " }, { "* ", "* ", "* ", "- ", "* ", "* ", "* ", "- " } };
+            m1 = new Monster("red", 0, matrix.GetLength(0) - 1);
+            if (size > 70)
+            {
+                int[] inim2 = ini_m2();
+                m2 = new Monster("blue", inim2[0], inim2[1]);
+                m2.previous = "down";
+            }
+            if (size > 140)
+            {
+                int[] inim3 = ini_m3();
+                m3 = new Monster("green", inim3[0], inim3[1]);
+                m3.previous = "up";
+            }
+
+        }
+
+        public int count_matrix(string[,] matrix)
+        {
+            int comp = 0;
+            foreach(string element in matrix)
+            {
+                if (element == "* ") { comp++; }
+            }
+            return comp;
+        }
+
+        public void matrix_creation_8x8()
+        {
+            string[,] mat = { { "P ", "* ", "* ", "* ", "* ", "* ", "* ", "* " }, { "* ", "- ", "* ", "- ", "* ", "- ", "- ", "* " }, { "* ", "- ", "* ", "* ", "* ", "* ", "* ", "* " }, { "* ", "- ", "* ", "- ", "* ", "- ", "* ", "- " }, { "* ", "* ", "* ", "* ", "* ", "- ", "* ", "* " }, { "* ", "- ", "- ", "- ", "* ", "- ", "- ", "* " }, { "* ", "- ", "* ", "* ", "* ", "- ", "* ", "* " }, { "* ", "* ", "* ", "- ", "* ", "* ", "* ", "- " } };
             matrix = mat;
+            score_max = count_matrix(matrix);
+            size = matrix.GetLength(0) * matrix.GetLength(1);
+        }
+
+        public void matrix_creation_14x12()
+        {
+            string[,] mat = { { "* ", "* ", "* ", "* ", "* ", "* ", "* ", "* ", "* ", "* ", "* ", "* ","* ", "* " }, { "* ", "- ", "- ", "* ", "- ", "- ", "* ", "- ", "* ", "- ", "- ", "* " ,"- ", "* "}, { "* ", "- ", "* ", "* ", "* ", "- ", "* ", "* ", "* ", "- ", "- ", "* ", "* ", "* " }, { "* ", "* ", "* ", "- ", "* ", "- ", "* ", "- ", "- ", "- ", "* ", "* ", "- ","* " }, { "* ", "- ", "- ", "- ", "* ", "* ", "* ", "* ", "* ", "- ", "* ", "- " , "- ", "* " }, { "* ", "* ", "* ", "* ", "* ", "- ", "- ", "- ", "* ", "* ", "* ", "* ", "* ", "* " }, { "* ", "- ", "* ", "- ", "* ", "* ", "* ", "* ", "* ", "- ", "- ", "- ", "- ", "* " }, { "* ", "- ", "* ", "- ", "- ", "- ", "* ", "- ", "* ", "* ", "* ", "* ", "* ", "* " }, { "* ", "* ", "* ", "- ", "* ", "* ", "* ", "- ", "* ", "- ", "* ", "- ","- ", "* " }, { "* ", "- ", "* ", "* ", "* ", "- ", "* ", "* ", "* ", "- ", "* ", "* ","- ", "* " }, { "* ", "- ", "- ", "- ", "- ", "- ", "* ", "- ", "* ", "- ", "- ", "* ","- ", "* " }, { "* ", "* ", "* ", "* ", "* ", "* ", "* ", "* ", "* ", "* ", "* ", "* ", "* ", "* " } };
+            matrix = mat;
+            score_max = count_matrix(matrix);
+            size = matrix.GetLength(0) * matrix.GetLength(1);
         }
 
         public void matrix_display()
@@ -75,7 +116,7 @@ namespace Pacman
         {
             if (direction == "down")
             {
-                matrix[c.y, c.x] = c.cover;
+                if (c.cover != "M ") { matrix[c.y, c.x] = c.cover; }
                 c.cover = matrix[c.y + 1, c.x];
                 matrix[c.y + 1, c.x] = "M ";
                 c.y++;
@@ -83,7 +124,7 @@ namespace Pacman
             }
             if (direction == "up")
             {
-                matrix[c.y, c.x] = c.cover;
+                if (c.cover != "M ") { matrix[c.y, c.x] = c.cover; }
                 c.cover = matrix[c.y - 1, c.x];
                 matrix[c.y - 1, c.x] = "M ";
                 c.y--;
@@ -91,7 +132,7 @@ namespace Pacman
             }
             if (direction == "left")
             {
-                matrix[c.y, c.x] = c.cover;
+                if (c.cover != "M ") { matrix[c.y, c.x] = c.cover; }
                 c.cover = matrix[c.y, c.x - 1];
                 matrix[c.y, c.x - 1] = "M ";
                 c.x--;
@@ -99,7 +140,7 @@ namespace Pacman
             }
             if (direction == "right")
             {
-                matrix[c.y, c.x] = c.cover;
+                if (c.cover != "M ") { matrix[c.y, c.x] = c.cover; }
                 c.cover = matrix[c.y, c.x + 1];
                 matrix[c.y, c.x + 1] = "M ";
                 c.x++;
@@ -107,44 +148,225 @@ namespace Pacman
             }
         }
 
+        public int[] ini_m2()
+        {
+            int range = 2;
+            int circle = 0;
+            string previous = "up";
+            int[] retour = new int[2];
+            int inix = matrix.GetLength(1) / 2;
+            int iniy = matrix.GetLength(0) / 2;
+            if (matrix[iniy,inix] != "- ") { retour[0] = inix; retour[1] = iniy; }
+            else
+            {
+                inix--;
+                if (matrix[iniy,inix] != "- ") { retour[0] = inix; retour[1] = iniy; return retour; }
+                else
+                {
+                    while (circle < 3)
+                    {
+                        if (previous == "up")
+                        {
+                            for(int i = 0; i < range; i++)
+                            {
+                                inix++;
+                                if (matrix[iniy, inix] != "- ") { retour[0] = inix; retour[1] = iniy; return retour; }
+                            }
+                            previous = "right";
+                        }
+                        if (previous == "right")
+                        {
+                            for (int i = 0; i < range; i++)
+                            {
+                                iniy++;
+                                if (matrix[iniy, inix] != "- ") { retour[0] = inix; retour[1] = iniy; return retour; }
+                            }
+                            previous = "down";
+                        }
+                        if (previous == "down")
+                        {
+                            for (int i = 0; i < range; i++)
+                            {
+                                iniy++;
+                                if (matrix[iniy, inix] != "- ") { retour[0] = inix; retour[1] = iniy; return retour; }
+                            }
+                            previous = "left";
+                        }
+                        if (previous == "left")
+                        {
+                            range++;
+                            for (int i = 0; i < range; i++)
+                            {
+                                iniy++;
+                                if (matrix[iniy, inix] != "- ") { retour[0] = inix; retour[1] = iniy; return retour; }
+                            }
+                            previous = "up";
+                        }
+                        circle++;
+                    }
+                }
+            }
+            return retour;
+        }
+
+        public int[] ini_m3()
+        {
+            int range = 2;
+            int circle = 0;
+            string previous = "up";
+            int[] retour = new int[2];
+            int inix = matrix.GetLength(1) / 4;
+            int iniy = matrix.GetLength(0) / 4;
+            if (matrix[iniy, inix] != "- ") { retour[0] = inix; retour[1] = iniy; }
+            else
+            {
+                inix--;
+                if (matrix[iniy, inix] != "- ") { retour[0] = inix; retour[1] = iniy; return retour; }
+                else
+                {
+                    while (circle < 3)
+                    {
+                        if (previous == "up")
+                        {
+                            for (int i = 0; i < range; i++)
+                            {
+                                inix++;
+                                if (matrix[iniy, inix] != "- ") { retour[0] = inix; retour[1] = iniy; return retour; }
+                            }
+                            previous = "right";
+                        }
+                        if (previous == "right")
+                        {
+                            for (int i = 0; i < range; i++)
+                            {
+                                iniy++;
+                                if (matrix[iniy, inix] != "- ") { retour[0] = inix; retour[1] = iniy; return retour; }
+                            }
+                            previous = "down";
+                        }
+                        if (previous == "down")
+                        {
+                            for (int i = 0; i < range; i++)
+                            {
+                                iniy++;
+                                if (matrix[iniy, inix] != "- ") { retour[0] = inix; retour[1] = iniy; return retour; }
+                            }
+                            previous = "left";
+                        }
+                        if (previous == "left")
+                        {
+                            range++;
+                            for (int i = 0; i < range; i++)
+                            {
+                                iniy++;
+                                if (matrix[iniy, inix] != "- ") { retour[0] = inix; retour[1] = iniy; return retour; }
+                            }
+                            previous = "up";
+                        }
+                        circle++;
+                    }
+                }
+            }
+            return retour;
+        }
+
         public bool end()
         {
             if (p.x == m1.x && p.y == m1.y) { Console.WriteLine("Game Over"); return true; }
+            //if (p.x == m2.x && p.y == m2.y) { Console.WriteLine("Game Over"); return true; }
+            //if (p.x == m3.x && p.y == m3.y) { Console.WriteLine("Game Over"); return true; }
             else if (p.score >= score_max) { Console.WriteLine("Win !"); return true; }
             else { return false; }
         }
 
-        public void red_move()
+        public void m1_move()
         {
-            if (m1.x == 6 && m1.y == 6) { move_monster("down", m1); return; }
-            if (m1.x == 6 && m1.y == 7) { move_monster("left", m1); return; }
-            if (m1.x == 5 && m1.y == 7) { move_monster("left", m1); return; }
-            if (m1.x == 4 && m1.y == 7) { move_monster("up", m1); return; }
-            if (m1.x == 4 && m1.y == 6) { move_monster("left", m1); return; }
-            if (m1.x == 3 && m1.y == 6) { move_monster("left", m1); return; }
-            if (m1.x == 2 && m1.y == 6) { move_monster("down", m1); return; }
-            if (m1.x == 2 && m1.y == 7) { move_monster("left", m1); return; }
-            if (m1.x == 1 && m1.y == 7) { move_monster("left", m1); return; }
             if (m1.x == 0 && m1.y != 0) { move_monster("up", m1); return; }
-            if (m1.x != 7 && m1.y == 0) { move_monster("right", m1); return; }
-            if (m1.x == 7 && m1.y == 0) { move_monster("down", m1); return; }
-            if (m1.x == 7 && m1.y == 1) { move_monster("down", m1); return; }
-            if (m1.x == 7 && m1.y == 2) { move_monster("left", m1); return; }
-            if (m1.x == 6 && m1.y == 2) { move_monster("down", m1); return; }
-            if (m1.x == 6 && m1.y == 3) { move_monster("down", m1); return; }
-            if (m1.x == 6 && m1.y == 4) { move_monster("right", m1); return; }
-            if (m1.x == 7 && m1.y == 4) { move_monster("down", m1); return; }
-            if (m1.x == 7 && m1.y == 5) { move_monster("down", m1); return; }
-            if (m1.x == 7 && m1.y == 6) { move_monster("left", m1); return; }
+            if (m1.x != matrix.GetLength(1)-1 && m1.y == 0) { move_monster("right", m1); return; }
+            if (m1.x == matrix.GetLength(1) - 1 && m1.y != matrix.GetLength(0)-1) { move_monster("down", m1); return; }
+            if (m1.x != 0 && m1.y == matrix.GetLength(0) - 1) { move_monster("left", m1); return; }
+
 
         }
 
-        public void blue_move()
+        public void m2_move(Monster m)
         {
-            if (m2.y == 4 && m2.x != 2) { move_monster("left", m2); return; }
-            if (m2.x == 2 && m2.y != 2) { move_monster("up", m2); return; }
-            if (m2.y == 2 && m2.x != 4) { move_monster("right", m2); return; }
-            if (m2.x == 4 && m2.y != 4) { move_monster("down", m2); return; }
+            if (m.previous == "right")
+            {
+                if (can_move(m, "down"))
+                {
+                    move_monster("down", m);
+                    m.previous = "down";
+                    return;
+                }
+                else if (can_move(m, "right"))
+                {
+                    move_monster("right", m);
+                    return;
+                }
+                else
+                {
+                    move_monster("up", m);
+                    return;
+                }
+            }
+            if (m.previous == "down")
+            {
+                if (can_move(m, "left"))
+                {
+                    move_monster("left", m);
+                    m.previous = "left";
+                    return;
+                }
+                else if (can_move(m, "down"))
+                {
+                    move_monster("down", m);
+                    return;
+                }
+                else
+                {
+                    move_monster("right", m);
+                    return;
+                }
+            }
+            if (m.previous == "left")
+            {
+                if (can_move(m, "up"))
+                {
+                    move_monster("up", m);
+                    m.previous = "up";
+                    return;
+                }
+                else if (can_move(m, "left"))
+                {
+                    move_monster("left", m);
+                    return;
+                }
+                else
+                {
+                    move_monster("down", m);
+                    return;
+                }
+            }
+            if (m.previous == "up")
+            {
+                if (can_move(m, "right"))
+                {
+                    move_monster("right", m);
+                    m.previous = "right";
+                    return;
+                }
+                else if (can_move(m, "up"))
+                {
+                    move_monster("up", m);
+                    return;
+                }
+                else
+                {
+                    move_monster("left", m);
+                    return;
+                }
+            }
         }
 
         public bool can_move(Character c, string direction)
@@ -239,7 +461,7 @@ namespace Pacman
             int i = 0;
             while (i <= power)
             {
-                if (i > 6) { div = 2; }
+                if (i > 4) { div = 2; }
                 int u = way_list.Count;
                 for (int k = 0; k < u ; k++)
                 {
@@ -249,7 +471,7 @@ namespace Pacman
                         Way way = new Way(wayt);
                         way.y -= 1;
                         if (matrix[way.y,way.x] == "* ") { way.score += (1 / div); }
-                        if (matrix[way.y, way.x] == "M " && wayt.list.Count < 2)
+                        if (matrix[way.y, way.x] == "M " && wayt.list.Count < safety)
                         {
                             fuite.Add(wayt.list[0]);
                         }
@@ -261,7 +483,7 @@ namespace Pacman
                         Way way = new Way(wayt);
                         way.y += 1;
                         if (matrix[way.y, way.x] == "* ") { way.score += (1 / div); }
-                        if (matrix[way.y, way.x] == "M " && wayt.list.Count < 2) { fuite.Add(wayt.list[0]); }
+                        if (matrix[way.y, way.x] == "M " && wayt.list.Count < safety) { fuite.Add(wayt.list[0]); }
                         way.list.Add("down");
                         way_list.Add(way);
                     }
@@ -270,7 +492,7 @@ namespace Pacman
                         Way way = new Way(wayt);
                         way.x -= 1;
                         if (matrix[way.y, way.x] == "* ") { way.score += (1 / div); }
-                        if (matrix[way.y, way.x] == "M " && wayt.list.Count < 2) { fuite.Add(wayt.list[0]); }
+                        if (matrix[way.y, way.x] == "M " && wayt.list.Count < safety) { fuite.Add(wayt.list[0]); }
                         way.list.Add("left");
                         way_list.Add(way);
                     }
@@ -279,7 +501,7 @@ namespace Pacman
                         Way way = new Way(wayt);
                         way.x += 1;
                         if (matrix[way.y, way.x] == "* ") { way.score += (1 / div); }
-                        if (matrix[way.y, way.x] == "M " && wayt.list.Count < 2)
+                        if (matrix[way.y, way.x] == "M " && wayt.list.Count < safety)
                         { fuite.Add(wayt.list[0]); }
                         way.list.Add("right");
                         way_list.Add(way);
@@ -302,6 +524,13 @@ namespace Pacman
                     }
                 }
             }
+            if (way_list.Count < 1)
+            {
+                safety--;
+                string temp = best_way(power);
+                safety = fixe_safety;
+                return temp;
+            }
             Way Wayt = way_list[0];
             foreach (Way way in way_list)
             {
@@ -316,14 +545,16 @@ namespace Pacman
 
         public void auto_deplacement()
         {
+            int range = matrix.GetLength(0) + matrix.GetLength(1);
             while (end() == false)
             {
-                red_move();
-                blue_move();
+                m1_move();
+                if (size > 70) { m2_move(m2); }
+                if (size > 140) { m2_move(m3); }
                 matrix_display();
                 if (p.x == m1.x && p.y == m1.y) { Console.WriteLine("Game Over"); break; }
                 Console.ReadKey();
-                string way = best_way(16);
+                string way = best_way(range);
                 move(way);
                 p.previous = way;
                 Console.WriteLine();

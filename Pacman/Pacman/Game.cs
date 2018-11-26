@@ -21,6 +21,7 @@ namespace Pacman
             p = new Pacman(0,0);
             matrix = new Matrix();
             menu();
+            init();
         }
 
         #region menu
@@ -279,9 +280,12 @@ namespace Pacman
         public bool end()
         {
             if (p.x == m1.x && p.y == m1.y) { Console.WriteLine("Game Over"); return true; }
-            //if (p.x == m2.x && p.y == m2.y) { Console.WriteLine("Game Over"); return true; }
-            //if (p.x == m3.x && p.y == m3.y) { Console.WriteLine("Game Over"); return true; }
-            else if (p.score >= matrix.max_score) { Console.WriteLine("Win !"); return true; }
+            if (matrix.size > 70) { if (p.x == m2.x && p.y == m2.y) { Console.WriteLine("Game Over"); return true; } }
+            else { goto last; }
+            if (matrix.size > 140) { if (p.x == m3.x && p.y == m3.y) { Console.WriteLine("Game Over"); return true; } }
+            else { goto last; }
+            last:
+            if (p.score >= matrix.max_score) { matrix.display(); Console.WriteLine("Win !"); return true; }
             else { return false; }
         }
 
@@ -549,6 +553,14 @@ namespace Pacman
 
         public void auto_deplacement()
         {
+            goto start;
+            game:
+                p = new Pacman(0, 0);
+                matrix = new Matrix();
+                menu();
+                init();
+            start:
+            bool unroll = false;
             int range = matrix.y_size + matrix.x_size;
             while (end() == false)
             {
@@ -557,15 +569,26 @@ namespace Pacman
                 if (matrix.size > 140) { m2_move(m3); }
                 matrix.display();
                 if (p.x == m1.x && p.y == m1.y) { Console.WriteLine("Game Over"); break; }
-                Console.ReadKey();
+                if (unroll == false)
+                {
+                    Console.WriteLine("Type < unroll > to unroll or press enter to go step by step");
+                    string test = Console.ReadLine();
+                    if (test == "unroll") { unroll = true; }
+                }
                 string way = best_way(range);
                 move(way);
                 p.previous = way;
                 Console.WriteLine();
             }
-            matrix.display();
-            Console.WriteLine("End Game");
-            Console.ReadKey();
+            goto sortie;
+            sortie:
+                Console.WriteLine("End Game");
+                Console.WriteLine("Type < close > to close or < again > to reset the game");
+                string sortie = Console.ReadLine();
+            if (sortie == "again") { goto game; }
+            if (sortie == "close") { goto close; }
+            else goto sortie;
+            close: return;
         }
 
         private static List<string> table_unique(List<string> list)

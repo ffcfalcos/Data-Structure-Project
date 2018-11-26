@@ -11,7 +11,6 @@ namespace Pacman
         static void Main(string[] args)
         {
             Game game = new Game();
-            game.init();
             game.auto_deplacement();
             Console.ReadKey();
         }

@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="Character.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="Matrix.cs" />
     <Compile Include="Monster.cs" />
     <Compile Include="Pacman.cs" />
     <Compile Include="Program.cs" />

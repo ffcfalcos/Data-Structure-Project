@@ -9,12 +9,14 @@ namespace Pacman
     public sealed class Game
     {
         int safety;
-        static int fixe_safety;
+        int fixe_safety;
+        int fixe_supermode;
         Pacman p;
         Monster m1;
         Monster m2;
         Monster m3;
         public Matrix matrix;
+        public int supermode;
 
         public Game()
         {
@@ -22,6 +24,8 @@ namespace Pacman
             matrix = new Matrix();
             menu();
             init();
+            fixe_supermode = (matrix.y_size+matrix.x_size) / 2;
+            create_super_coin();
         }
 
         #region menu
@@ -43,6 +47,7 @@ namespace Pacman
             }
             Console.WriteLine();
         }
+
         #endregion
 
         #region initialisation 
@@ -50,6 +55,7 @@ namespace Pacman
         public void init()
         {
             m1 = new Monster("red", 0, matrix.y_size - 1);
+            m1.previous = "down";
             if (matrix.size > 70)
             {
                 int[] inim2 = ini_m2();
@@ -190,51 +196,56 @@ namespace Pacman
 
         #endregion
 
-        /*public void create_super_coin()
+        public void create_super_coin()
         {
             int c = 0;
-            for (int i = 0; i < matrix.y_size)
+            for (int i = 0; i < matrix.y_size; i++)
             {
-                for (int k = 0; k < matrix.x_size)
+                for (int k = 0; k < matrix.x_size; k++)
                 {
-                    if (matrix[i,k] == "* ")
+                    if (c % 30 == 0 && c!= 0)
                     {
-                        if (c % 50 == 0)
+                        if (matrix.mat[i, k] == "* ")
                         {
-                            matrix[i,k] = "+ ";
+                            matrix.mat[i, k] = "+ ";
                         }
-                        c++;
+                        else { c--; }
                     }
+                    c++;
                 }
             }
-        }*/
+        }
 
         public void move(string direction)
         {
             if (direction == "down")
             {
-                if(matrix.mat[p.y + 1, p.x] == "* ") { p.score++; }
+                if(matrix.ic(p.y + 1, p.x)) { p.score++; }
+                if(matrix.mat[p.y + 1, p.x] == "+ ") { supermode = fixe_supermode; }
                 matrix.mat[p.y + 1, p.x] = "P ";
                 matrix.mat[p.y, p.x] = ". ";
                 p.y++;
             }
             if (direction == "up")
             {
-                if (matrix.mat[p.y - 1, p.x] == "* ") { p.score++; }
+                if (matrix.ic(p.y - 1, p.x)) { p.score++; }
+                if (matrix.mat[p.y - 1, p.x] == "+ ") { supermode = fixe_supermode; }
                 matrix.mat[p.y - 1, p.x] = "P ";
                 matrix.mat[p.y, p.x] = ". ";
                 p.y--;
             }
             if (direction == "left")
             {
-                if (matrix.mat[p.y, p.x - 1] == "* ") { p.score++; }
+                if (matrix.ic(p.y, p.x - 1)) { p.score++; }
+                if (matrix.mat[p.y, p.x - 1] == "+ ") { supermode = fixe_supermode; }
                 matrix.mat[p.y, p.x - 1] = "P ";
                 matrix.mat[p.y, p.x] = ". ";
                 p.x--;
             }
             if (direction == "right")
             {
-                if (matrix.mat[p.y, p.x + 1] == "* ") { p.score++; }
+                if (matrix.ic(p.y, p.x + 1)) { p.score++; }
+                if (matrix.mat[p.y, p.x + 1] == "+ ") { supermode = fixe_supermode; }
                 matrix.mat[p.y, p.x + 1] = "P ";
                 matrix.mat[p.y, p.x] = ". ";
                 p.x++;
@@ -246,6 +257,7 @@ namespace Pacman
             if (direction == "down")
             {
                 if (c.cover != "M ") { matrix.mat[c.y, c.x] = c.cover; }
+                if (c.cover == "P ") { matrix.mat[c.y, c.x] = ". "; }
                 c.cover = matrix.mat[c.y + 1, c.x];
                 matrix.mat[c.y + 1, c.x] = "M ";
                 c.y++;
@@ -254,6 +266,7 @@ namespace Pacman
             if (direction == "up")
             {
                 if (c.cover != "M ") { matrix.mat[c.y, c.x] = c.cover; }
+                if (c.cover == "P ") { matrix.mat[c.y, c.x] = ". "; }
                 c.cover = matrix.mat[c.y - 1, c.x];
                 matrix.mat[c.y - 1, c.x] = "M ";
                 c.y--;
@@ -262,6 +275,7 @@ namespace Pacman
             if (direction == "left")
             {
                 if (c.cover != "M ") { matrix.mat[c.y, c.x] = c.cover; }
+                if (c.cover == "P ") { matrix.mat[c.y, c.x] = ". "; }
                 c.cover = matrix.mat[c.y, c.x - 1];
                 matrix.mat[c.y, c.x - 1] = "M ";
                 c.x--;
@@ -270,6 +284,7 @@ namespace Pacman
             if (direction == "right")
             {
                 if (c.cover != "M ") { matrix.mat[c.y, c.x] = c.cover; }
+                if (c.cover == "P ") { matrix.mat[c.y, c.x] = ". "; }
                 c.cover = matrix.mat[c.y, c.x + 1];
                 matrix.mat[c.y, c.x + 1] = "M ";
                 c.x++;
@@ -279,14 +294,28 @@ namespace Pacman
 
         public bool end()
         {
-            if (p.x == m1.x && p.y == m1.y) { Console.WriteLine("Game Over"); return true; }
-            if (matrix.size > 70) { if (p.x == m2.x && p.y == m2.y) { Console.WriteLine("Game Over"); return true; } }
-            else { goto last; }
-            if (matrix.size > 140) { if (p.x == m3.x && p.y == m3.y) { Console.WriteLine("Game Over"); return true; } }
-            else { goto last; }
-            last:
-            if (p.score >= matrix.max_score) { matrix.display(); Console.WriteLine("Win !"); return true; }
-            else { return false; }
+            if (supermode == 0)
+            {
+                if (p.x == m1.x && p.y == m1.y) { Console.WriteLine("Game Over"); return true; }
+                if (matrix.size > 70) { if (p.x == m2.x && p.y == m2.y) { Console.WriteLine("Game Over"); return true; } }
+                else { goto last; }
+                if (matrix.size > 140) { if (p.x == m3.x && p.y == m3.y) { Console.WriteLine("Game Over"); return true; } }
+                else { goto last; }
+                last:
+                if (p.score >= matrix.max_score) { matrix.display(); Console.WriteLine("Win !"); return true; }
+                else { return false; }
+            }
+            else
+            {
+                if (p.x == m1.x && p.y == m1.y) { if (m1.cover == "* ") { m1.cover = ". "; p.score++; return false; } }
+                if (matrix.size > 70) { if (p.x == m2.x && p.y == m2.y) { if (m2.cover == "* ") { m2.cover = ". "; p.score++; return false; } } }
+                else { goto last; }
+                if (matrix.size > 140) { if (p.x == m3.x && p.y == m3.y) { if (m3.cover == "* ") { m3.cover = ". "; p.score++; return false; } } }
+                else { goto last; }
+                last:
+                if (p.score >= matrix.max_score) { return false; }
+                else { return false; }
+            }
         }
 
         public void m1_move()
@@ -373,6 +402,103 @@ namespace Pacman
                 {
                     move_monster("left", m);
                     return;
+                }
+            }
+        }
+
+        public void monster_random_move(Monster m)
+        {
+            Random rnd = new Random();
+            if (m.previous == "right")
+            {
+                if (can_move(m,"up") || can_move(m, "left") || can_move(m, "down"))
+                {
+                    lab1:
+                    int rand = rnd.Next(1, 4);
+                    if (rand == 1)
+                    {
+                        if (can_move(m, "up")) { move_monster("up", m); }
+                        else { goto lab1; }
+                    }
+                    if (rand == 2)
+                    {
+                        if (can_move(m, "left")) { move_monster("left", m); }
+                        else { goto lab1; }
+                    }
+                    if (rand == 3)
+                    {
+                        if (can_move(m, "down")) { move_monster("down", m); }
+                        else { goto lab1; }
+                    }
+                }
+            }
+            if (m.previous == "left")
+            {
+                if (can_move(m, "up") || can_move(m, "right") || can_move(m, "down"))
+                {
+                    lab2:
+                    int rand = rnd.Next(1, 4);
+                    if (rand == 1)
+                    {
+                        if (can_move(m, "up")) { move_monster("up", m); }
+                        else { goto lab2; }
+                    }
+                    if (rand == 2)
+                    {
+                        if (can_move(m, "right")) { move_monster("right", m); }
+                        else { goto lab2; }
+                    }
+                    if (rand == 3)
+                    {
+                        if (can_move(m, "down")) { move_monster("down", m); }
+                        else { goto lab2; }
+                    }
+                }
+            }
+            if (m.previous == "up")
+            {
+                if (can_move(m, "right") || can_move(m, "left") || can_move(m, "down"))
+                {
+                    lab3:
+                    int rand = rnd.Next(1, 4);
+                    if (rand == 1)
+                    {
+                        if (can_move(m, "right")) { move_monster("right", m); }
+                        else { goto lab3; }
+                    }
+                    if (rand == 2)
+                    {
+                        if (can_move(m, "left")) { move_monster("left", m); }
+                        else { goto lab3; }
+                    }
+                    if (rand == 3)
+                    {
+                        if (can_move(m, "down")) { move_monster("down", m); }
+                        else { goto lab3; }
+                    }
+                }
+            }
+            if (m.previous == "down")
+            {
+                if (can_move(m, "up") || can_move(m, "left") || can_move(m, "right"))
+                {
+                    lab4:
+                    int rand = rnd.Next(1, 4);
+                    if (rand == 1)
+                    {
+                        if (can_move(m, "up")) { move_monster("up", m); }
+                        else { goto lab4; }
+                    }
+                    if (rand == 2)
+                    {
+                        if (can_move(m, "left")) { move_monster("left", m); }
+                        else { goto lab4; }
+                    }
+                    if (rand == 3)
+                    {
+                        if (can_move(m, "right")) { move_monster("right", m); }
+                        else { goto lab4; }
+                    }
                 }
             }
         }
@@ -483,7 +609,7 @@ namespace Pacman
                         {
                             fuite.Add(wayt.list[0]);
                         }
-                        way.list.Add("up");
+                        way.list.Add("up"); 
                         way_list.Add(way);
                     }
                     if (can_move(wayt, "down") && wayt.list[wayt.list.Count - 1] != "up")
@@ -518,8 +644,7 @@ namespace Pacman
                 way_list.RemoveRange(0, u);
                 i++;
             }
-            //fuite = table_unique(fuite);
-            if (fuite.Count > 0)
+            if (fuite.Count > 0 && supermode < fixe_safety - 1)
             {
                 foreach (string element in fuite)
                 {
@@ -577,6 +702,7 @@ namespace Pacman
                 }
                 string way = best_way(range);
                 move(way);
+                if (supermode != 0) { supermode--; }
                 p.previous = way;
                 Console.WriteLine();
             }

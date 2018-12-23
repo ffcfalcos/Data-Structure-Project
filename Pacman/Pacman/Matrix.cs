@@ -64,5 +64,11 @@ namespace Pacman
         {
             return (y_size + x_size) / 4;
         }
+
+        public bool ic(int y, int x)
+        {
+            if (mat[y,x] == "* " || mat[y,x] == "+ ") { return true; }
+            else { return false; }
+        }
     }
 }

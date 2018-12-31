@@ -4,7 +4,7 @@ This project is realised by Thomas Beauchataud
 
 The goal of this project is to realize a self resolve pacman.
 The principle of the algorithm is to create and store all possible ways of the pacman in a list of way. A way contain a list and a score (number of coin on the way). We fixe a security distance from monster (here the number is fixed at the half of the minimum size of the matrix). If ways dont cross any monster in security distance cases, we select the way which has the best score and we move the pacman in the first direction of this way direction list. If a way find a monster in the security distance area and the pacman isn't in super mode, we delete all ways which start by the same direction of the way which leads to a monster.
-This is the general vision of the algorythm, see demonstration in this video : https://youtu.be/KFt_iebI7hU and explications here : www.youtube.fr
+This is the general vision of the algorythm, see demonstration in this video : https://youtu.be/KFt_iebI7hU and explications here : https://youtu.be/IQRr29--6MM
 
 
 In a first time, we will only be interested in the algorithmic part of the project, so we execute it with a simple matrix 8x8, 1 pacman, and 1 monster.
